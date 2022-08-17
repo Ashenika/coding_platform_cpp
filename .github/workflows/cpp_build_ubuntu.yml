@@ -1,0 +1,31 @@
+# This workflow sets up and runs MSBuild and VSTest
+# to build and test a Visual Studio solution.
+
+name: Build and Unit Test with MS Visual C++ Unit Test Framework
+
+on:
+  push:
+    branches: 
+      - main
+      - development
+  
+  pull_request:
+    branches:
+      - main
+      - development
+
+jobs:
+  ubuntu-build:
+    runs-on: ubuntu-latest
+    name: Run MSBuild and VSTest
+     
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.0.0
+      
+    - name: Build project
+      uses: nicledomaS/cmake_build_action@v1.4
+      with:
+        submodule_update: ON
+        run_tests: ON
+        unit_test_build: -Dtest=ON
