@@ -1,7 +1,7 @@
 # This workflow sets up and runs MSBuild and VSTest
 # to build and test a Visual Studio solution.
 
-name: Build and Unit Test in Ubuntu
+name: Build and Unit Test with MS Visual C++ Unit Test Framework
 
 on:
   push:
@@ -15,24 +15,43 @@ on:
       - development
 
 jobs:
-  ubuntu-build:
-    runs-on: ubuntu-latest
-    name: Run MSBuild and VSTest
-     
+  Test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        compiler:
+          - llvm
+          - gcc
+          # you can specify the version after `-` like `llvm-13.0.0`.
+        include:
+          - os: "windows-2022"
+            compiler: "msvc"
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      
-      - name: Setup .NET Core SDK v3.1
-        uses: actions/setup-dotnet@v2
+      - uses: actions/checkout@v2
+      - name: Cache
+        uses: actions/cache@v2
         with:
-            dotnet-version: '3.1.x'
-          
-      - name: Install dependencies
-        run: dotnet restore
-        
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-        
-      - name: Unit Test
-        run: dotnet vstest
+          path: |
+            ~/vcpkg
+            ./build/vcpkg_installed
+            ${{ env.HOME }}/.cache/vcpkg/archives
+            ${{ env.XDG_CACHE_HOME }}/vcpkg/archives
+            ${{ env.LOCALAPPDATA }}\vcpkg\archives
+            ${{ env.APPDATA }}\vcpkg\archives
+          key: ${{ runner.os }}-${{ matrix.compiler }}-${{ env.BUILD_TYPE }}-${{ hashFiles('**/CMakeLists.txt') }}-${{ hashFiles('./vcpkg.json')}}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.BUILD_TYPE }}-
+
+      - name: Setup Cpp
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          vcvarsall: ${{ contains(matrix.os, 'windows') }}
+          cmake: true
+          ninja: true
+          vcpkg: true
+          cppcheck: true
+          clangtidy: true # instead of `true`, which chooses the default version, you can pass a specific version.
