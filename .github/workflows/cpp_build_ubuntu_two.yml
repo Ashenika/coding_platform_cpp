@@ -1,41 +1,37 @@
+# This workflow sets up and runs MSBuild and VSTest
+# to build and test a Visual Studio solution.
 
-# This is a basic workflow to help you get started with the Run C/C++test action for a CMake-based project.
-name: C/C++test with CMake
+name: Build and Unit Test for C#
 
 on:
   push:
-    branches: [ master, main ]
+    branches: 
+      - main
+  
   pull_request:
-    branches: [ master, main ]
-
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
-  run-cpptest-make:
-    name: Analyze project with C/C++test
+  build:
 
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    # Configures your CMake project. Be sure the compile_commands.json file is created.
-    - name: Configure project
-      run: cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -S . -B build
-
-    # Builds your CMake project. (This step is optional, as it is not required for code analysis).
-    - name: Build project (optional)
-      run: cmake --build build
-
-    # Runs code analysis with C/C++test.
-    - name: Run C/C++test
-      uses: parasoft/run-cpptest-action@1.0.1
-      with:
-        # For CMake-based projects, use a compile_commands.json file as the input for analysis. 
-        input: build/compile_commands.json
-
-   
-   
-
-              
+      - name: Checkout code
+        uses: actions/checkout@v3
+        id: checkout_code
+      
+      - name: Setup .NET Core SDK v3.1
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '3.1.x'
+          
+      - name: Install dependencies
+        run: dotnet restore
+        
+      - name: Build
+        run: msbuild
+        
+      - name: Unit Test
+        run: dotnet test
