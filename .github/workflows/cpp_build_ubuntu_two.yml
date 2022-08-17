@@ -1,37 +1,23 @@
-# This workflow sets up and runs MSBuild and VSTest
-# to build and test a Visual Studio solution.
+# Heavily inspired (i.e. copy/paste) from https://gist.github.com/NickNaso/0d478f1481686d5bcc868cac06620a60
+name: CMake Build Matrix
 
-name: Build and Unit Test for C#
-
-on:
+# Controls when the action will run. Triggers the workflow on push
+on: 
   push:
-    branches: 
-      - main
-  
   pull_request:
-    branches:
-      - main
+  release:
 
 jobs:
+  # This workflow contains a single job called "build"
   build:
-
+    name: Build
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        id: checkout_code
-      
-      - name: Setup .NET Core SDK v3.1
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: '3.1.x'
-          
-      - name: Install dependencies
-        run: dotnet restore
-        
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-        
-      - name: Unit Test
-        run: dotnet test
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Run Parasoft C/C++test
+  # You may pin to the exact commit or the version.
+  # uses: parasoft/run-cpptest-action@aeb0150eeb0f96098ad3bac53609fd462f88c4f6
+        uses: parasoft/run-cpptest-action@1.0.1
