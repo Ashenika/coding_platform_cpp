@@ -1,16 +1,17 @@
-name: C/C++ CI
-
-on: [push]
-
+name: NuGet Restore
+on: [push, pull_request]
 jobs:
-  ubuntu-build:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        nuget: [latest]
+    name: NuGet@${{ matrix.nuget }} sample
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2.0.0
-    - name: Build project
-      uses: nicledomaS/cmake_build_action@v1.4
-      with:
-        submodule_update: ON
-        run_tests: ON
-        unit_test_build: -Dtest=ON
+      - uses: actions/checkout@master
+      - name: Setup NuGet.exe
+        uses: nuget/setup-nuget@v1
+        with:
+          nuget-version: ${{ matrix.nuget }}
+      - run: nuget restore template_cpp.sln
