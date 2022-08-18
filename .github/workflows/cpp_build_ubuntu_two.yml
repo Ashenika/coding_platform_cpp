@@ -2,12 +2,9 @@ name: NuGet Restore
 on: [push, pull_request]
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        nuget: [latest]
-    name: NuGet@${{ matrix.nuget }} sample
+    runs-on: ubuntu-latest
+    
+    name: NuGet@latest sample
     steps:
       - uses: actions/checkout@master
       - name: Setup NuGet.exe
