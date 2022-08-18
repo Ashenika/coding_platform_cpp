@@ -1,23 +1,16 @@
-# Heavily inspired (i.e. copy/paste) from https://gist.github.com/NickNaso/0d478f1481686d5bcc868cac06620a60
-name: CMake Build Matrix
+name: C/C++ CI
 
-# Controls when the action will run. Triggers the workflow on push
-on: 
-  push:
-  pull_request:
-  release:
+on: [push]
 
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    name: Build
+  ubuntu-build:
     runs-on: ubuntu-latest
-
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      - name: Run Parasoft C/C++test
-  # You may pin to the exact commit or the version.
-  # uses: parasoft/run-cpptest-action@aeb0150eeb0f96098ad3bac53609fd462f88c4f6
-        uses: parasoft/run-cpptest-action@1.0.1
+    - name: Checkout
+      uses: actions/checkout@v2.0.0
+    - name: Build project
+      uses: nicledomaS/cmake_build_action@v1.4
+      with:
+        submodule_update: ON
+        run_tests: ON
+        unit_test_build: -Dtest=ON
